@@ -1,3 +1,4 @@
+-- first line is 
 doubleMe :: Num a => a -> a
 doubleMe x = x + x
 
@@ -119,3 +120,52 @@ calcBmis :: (RealFloat a) => [(a, a)] -> [a]
 calcBmis xs = [bmi w h | (w, h) <- xs]
   where
     bmi weight height = weight / height ^ 2
+
+cylinder :: (RealFloat a) => a -> a -> a  
+cylinder r h = 
+    let sideArea = 2 * pi * r * h  
+        topArea = pi * r ^2  
+    in  sideArea + 2 * topArea  
+
+head1 :: [a] -> a  
+head1 xs = case xs of [] -> error "No head for empty lists!"  
+                      (x:_) -> x  
+
+
+maximum' :: (Ord a) => [a] -> a  
+maximum' [] = error "maximum of empty list"  
+maximum' [x] = x  
+maximum' (x:xs)   
+    | x > maxTail = x  
+    | otherwise = maxTail
+    where maxTail = maximum' xs
+
+maximum1 :: (Ord a) => [a] -> a  
+maximum1 [] = error "maximum of empty list"  
+maximum1 [x] = x  
+maximum1 (x:xs) = max x (maximum' xs) 
+
+
+replicate' :: (Num i, Ord i) => i -> a -> [a]  
+replicate' n x  
+    | n <= 0    = []  
+    | otherwise = x:replicate' (n-1) x  
+
+
+
+take' :: (Num i, Ord i) => i -> [a] -> [a]  
+take' n _  
+    | n <= 0   = []  
+take' _ []     = []  
+take' n (x:xs) = x : take' (n-1) xs 
+
+reverse' :: [a] -> [a]  
+reverse' [] = []  
+reverse' (x:xs) = reverse' xs ++ [x]  
+
+
+-- this would give infinite repition. 
+-- haskell is lazy. so if you run take 5 (replicate 3). it won't crash! wow. 
+-- only computer as much as it needs to.
+repeat' :: a -> [a]  
+repeat' x = x:repeat' x  
