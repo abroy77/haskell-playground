@@ -240,4 +240,101 @@ quicksort [] = []
 quicksort (x:xs) =   
     let smallerSorted = quicksort [a | a <- xs, a <= x]  
         biggerSorted = quicksort [a | a <- xs, a > x]  
-    in  smallerSorted ++ [x] ++ biggerSorted 
+    in  smallerSorted ++ [x] ++ biggerSorted
+
+{-|
+  Now we're looking at curried functions and how haskell allows you to pass functions as 
+  arguments and return functions. quite interesting and a bit strange tbh
+  
+-}
+
+-- this applied a function twice to an arg. first arg is a function. second arg is arg
+
+-- these are slightly mad. 
+-- applyTwice (3:) [1]  
+-- applyTwice ("HAHA " ++) "HEY"  
+-- applyTwice (++ " HAHA") "HEY"  
+-- infix operators assume you're inputting the missing side. smort
+
+multThree :: (Num a) => a -> a -> a -> a  
+multThree x y z = x * y * z
+
+applyTwice :: (a -> a) -> a -> a  
+applyTwice f x = f (f x)  
+
+
+{-|
+Now we're going to use higher order programming to 
+implement a really useful function that's in the standard library. 
+It's called zipWith. It takes a function and two lists as parameters and 
+then joins the two lists by applying the function between corresponding elements. 
+Here's how we'll implement it:-}
+
+-- see how similar this is to zip'
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]  
+zipWith' _ [] _ = []  
+zipWith' _ _ [] = []  
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+
+-- zipWith' (+) [4,2,5,6] [2,6,2,3] 
+-- zipWith' (++) ["foo ", "bar ", "baz "] ["fighters", "hoppers", "aldrin"]  
+--["foo fighters","bar hoppers","baz aldrin"]
+-- zipWith' (*) (replicate 5 2) [1..]
+-- this next one is crazy
+-- zipWith' (zipWith' (*)) [[1,2,3],[3,5,6],[2,3,4]] [[3,2,2],[3,4,5],[5,4,3]]
+
+-- flip the order of arguments to a function. 
+-- doesn't change the order of inputs. fundamentally alters the function and returns a 
+-- new function
+flip' :: (a -> b -> c) -> b -> a -> c  
+flip' f y x = f x y  
+-- flip' zip [1,2,3,4,5] "hello"
+-- zipWith (flip' div) [2,2..] [10,8,6,4,2]    
+
+-- maps and filters
+
+--  map (+3) [1,5,3,1,6]  
+--map (replicate 3) [3..6] 
+-- map (map (^2)) [[1,2],[3,4,5,6],[7,8]] 
+
+--filter takes predicate and list. keeps items that return true for predicate
+
+-- filter (`elem` ['A'..'Z']) "i lauGh At You BecAuse u r aLL the Same" 
+
+-- quicksort with filter instead of list comprehension
+
+quicksortFilter :: (Ord a) => [a] -> [a]    
+quicksortFilter [] = []    
+quicksortFilter (x:xs) =     
+    let smallerSorted = quicksort (filter (<=x) xs)  
+        biggerSorted = quicksort (filter (>x) xs)   
+    in  smallerSorted ++ [x] ++ biggerSorted
+
+-- takeWhile function takes elems from a list till it fails. after one elem fails it stops
+-- useful for parsing long or infinite lists where a condition changes from only true to only
+-- false after some point in the list
+ -- sum (takeWhile (<10000) (filter odd (map (^2) [1..])))   
+
+
+ -- function to find for all starting numbers between 1 and 100, how many collatz chains have a length greater than 15
+ -- collatz chain: if x divisible by 2, then divide it. 
+ -- if not then multiply by three then add 1. repeat.
+ -- apparently always ends at 1. takes diff time to
+
+chain :: (Integral a) => a -> [a]
+chain 1 = [1] 
+chain n
+    | even n = n:chain (n `div` 2) -- cant use normal '/' as its return type is fractional and we need Integral
+    -- `div` returns Integral. 
+    | odd n = n:chain (n*3+1)
+
+numLongChains :: Int  
+numLongChains = length (filter isLong (map chain [1..100]))  
+    where isLong xs = length xs > 15
+
+
+{-|
+
+Lambdas
+
+-}
