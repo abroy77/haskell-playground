@@ -338,3 +338,88 @@ numLongChains = length (filter isLong (map chain [1..100]))
 Lambdas
 
 -}
+numLongChains' :: Int  
+numLongChains' = length (filter (\xs -> length xs > 15) (map chain [1..100]))  
+
+-- zipWith (\a b -> (a * 30 + 3) / b) [5,4,3,2,1] [1,2,3,4,5]  
+
+addThree1 :: (Num a) => a -> a -> a -> a  
+addThree1 = \x -> \y -> \z -> x + y + z  
+
+flip1 :: (a -> b -> c) -> b -> a -> c  
+flip1 f = \x y -> f y x  
+
+
+{-|
+Folds and horses
+ways to do recursion on a list with a binary function
+binary dunciton means it takes 2 args. 
+boolean function is diff. that's the one that returns True / False
+
+
+FOLD takes
+- binary function
+- starting value
+- list to fold up
+
+
+-}
+
+sum1 :: Num a => [a] -> a 
+sum1 xs = foldl (+) 0 xs 
+
+--using currying it looks more succint. 
+-- this returns a function. that takes a list as argument. 
+sum2 :: Num a => [a] -> a 
+sum2 = foldl (+) 0 
+
+
+elem1 :: (Eq a) => a -> [a] -> Bool 
+elem1 x = foldl (\acc y -> if x==y then True else acc) False 
+
+-- remember 1:[] == [1]
+-- 1:2:3:[] == [1,2,3]
+map' :: (a -> b) -> [a] -> [b]  
+map' f xs= foldr (\x acc -> f x : acc) [] xs
+
+
+{- Folds can be used to implement any function where you traverse 
+a list once, element by element, and then return something based on that.
+ Whenever you want to traverse a list to return something, chances are you 
+ want a fold. That's why folds are, along with maps and filters, 
+ one of the most useful types of functions in functional programming.
+ 
+ acc = accumulator -}
+
+maximum2 :: (Ord a) => [a] -> a  
+maximum2 = foldr1 (\x acc -> if x > acc then x else acc)  
+  
+reverse1 :: [a] -> [a]  
+reverse1 = foldl (\acc x -> x : acc) []  
+  
+product' :: (Num a) => [a] -> a  
+product' = foldr1 (*)  
+  
+-- when outputing a list using fold. foldr better than foldl
+-- this is because you append x:xs. rather than xs++x. the latter needs you
+-- to traverse through all of xs to the last element of it then add x. 
+-- whereas foldr just appends list to end of an element. no going through
+-- list required
+filter' :: (a -> Bool) -> [a] -> [a]  
+filter' p = foldr (\x acc -> if p x then x : acc else acc) []  
+  
+head2 :: [a] -> a  
+head2 = foldr1 (\x _ -> x)  
+  
+last' :: [a] -> a  
+last' = foldl1 (\_ x -> x)  
+
+{- 
+Function application with $
+
+lowest operator precedence f $ x
+
+instead of : sum (filter (> 10) (map (*2) [2..10]))
+one can write : sum $ filter (>10) $ map (+2) [2..10]
+
+-}
